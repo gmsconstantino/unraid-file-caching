@@ -1,0 +1,23 @@
+Menu="Utilities"
+Type="xmenu"
+Title="File Caching"
+Icon="folder"
+Tabs="true"
+---
+<?php
+/* Copyright 2020,2020 Constantino Gomes
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version 2,
+ * as published by the Free Software Foundation.
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ */
+
+$plugin = "unraid-file-caching";
+$docroot = $docroot ?? $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
+require_once "$docroot/plugins/$plugin/include/Legacy.php";
+?>
+<h1>File Caching</h1>
+<p>hello world</p>

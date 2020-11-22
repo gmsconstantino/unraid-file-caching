@@ -1,0 +1,64 @@
+<?xml version='1.0' standalone='yes'?>
+
+<!DOCTYPE PLUGIN [
+<!ENTITY name      "unraid-file-caching">
+<!ENTITY author    "gmsconstantino">
+<!ENTITY version   "2020.11.22">
+<!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
+<!ENTITY launch    "Settings/FileCaching">
+<!ENTITY github    "gmsconstantino/unraid-file-caching">
+<!ENTITY pluginURL "https://github.com/gmsconstantino/unraid-file-caching/raw/master/plugin/unraid-file-caching.plg">
+<!ENTITY md5 "">
+]>
+
+<PLUGIN  name="&name;"
+         author="&author;"
+         version="&version;"
+         launch="&launch;"
+         pluginURL="&pluginURL;"
+         min="6.5"
+         icon="folder">
+
+    <!-- The 'pre-install' script. -->
+    <FILE Run="/bin/bash">
+    <INLINE>
+    # Remove old 'source' files
+    rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version;')
+    </INLINE>
+    </FILE>
+
+    <!--
+    The 'source' file.
+    -->
+    <FILE Name="/boot/config/plugins/&name;/&name;-&version;.txz" Run="upgradepkg --install-new">
+    <URL>https://raw.github.com/&github;/main/archive/&name;-&version;-x86_64-1.txz</URL>
+    <!--<MD5>&md5;</MD5>-->
+    </FILE>
+
+    <!--
+    The 'post-install' script
+    -->
+    <FILE Run="/bin/bash">
+    <INLINE>
+    echo ""
+    echo "----------------------------------------------------"
+    echo " &name; has been installed."
+    echo " Copyright 2020-2020, Constantino Gomes Software"
+    echo " Version: &version;"
+    echo "----------------------------------------------------"
+    echo ""
+    </INLINE>
+    </FILE>
+
+    <!--
+    The 'remove' script.
+    -->
+    <FILE Run="/bin/bash" Method="remove">
+    <INLINE>
+    removepkg &name;-&version;
+    rm -rf &plugdir;
+    rm -rf /boot/config/plugins/&name;
+    rm -rf /boot/packages/&name;-&version;
+    </INLINE>
+    </FILE> 
+</PLUGIN>
