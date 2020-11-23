@@ -2,12 +2,14 @@
 # Usage:
 #
 plugin="unraid-file-caching"
-disks_file="/tmp/${plugin}/${plugin}.disks"
+tmp="/tmp/${plugin}"
+disks_file="${tmp}/${plugin}.disks"
 CONFIG="/boot/config/plugins/${plugin}/${plugin}.cfg"
 source $CONFIG
 
 # Create list of disks to include in the inotify.
 rm -f "$disks_file" 2>/dev/null
+mkdir -p $tmp
 drives="/mnt/disk[^s]*"
 disks=($drives)
 for i in "${disks[@]}"

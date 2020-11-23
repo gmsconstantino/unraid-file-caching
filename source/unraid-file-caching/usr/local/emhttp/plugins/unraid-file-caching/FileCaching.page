@@ -17,12 +17,16 @@ Tabs="true"
 
 $plugin = "unraid-file-caching";
 $docroot = $docroot ?? $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
+$translations = file_exists("$docroot/webGui/include/Translations.php");
 require_once "$docroot/plugins/$plugin/include/Legacy.php";
 ?>
+<?if (!$translations):?>
+<?eval('?>'.parse_file("$docroot/plugins/$plugin/FileCaching.page"))?>
+<?else:?>
 
 <script>
 $(function() {
-  showStatus('pid','file.activity');
+  showStatus('pid','unraid-file-caching');
 });
 </script>
 
@@ -49,7 +53,7 @@ $disks = glob("/mnt/disk[^s]*");
 natcasesort($disks);
 $filesactive = "";
 foreach ($disks as $disk) {
-	$files = shell_exec("cat /var/log/file.activity.log 2>/dev/null | grep '{$disk}/'");
+	$files = shell_exec("cat /var/log/{$plugin}.log 2>/dev/null | grep '{$disk}/'");
 	if (!empty($files)) {
 		$filesactive .= "<strong>** Disk ".substr($disk,9)."</strong>\n";
 		$filesactive .= $files;
@@ -57,14 +61,14 @@ foreach ($disks as $disk) {
 	}
 }
 // UD disks activity.
-$files = shell_exec("cat /var/log/file.activity.log 2>/dev/null | grep '/mnt/disks/'");
+$files = shell_exec("cat /var/log/{$plugin}.log 2>/dev/null | grep '/mnt/disks/'");
 if (!empty($files)) {
 	$filesactive .= "<strong>** Unassigned Devices"."</strong>\n";
 	$filesactive .= $files;
 	$filesactive .= "\n";
 }
 // Cache activity.
-$files = shell_exec("cat /var/log/file.activity.log 2>/dev/null | grep '/mnt/cache/'");
+$files = shell_exec("cat /var/log/{$plugin}.log 2>/dev/null | grep '/mnt/cache/'");
 if (!empty($files)) {
 	$filesactive .= "<strong>** Cache"."</strong>\n";
 	$filesactive .= $files;
@@ -83,10 +87,10 @@ $(function() {
 </script>
 
 <?if ($var['mdState']=="STARTED"):?>
-	<?if (! is_file("/var/run/file.activity.pid")):?>
+	<?if (! is_file("/var/run/{$plugin}.pid")):?>
 	<div style="position:relative;float:left;text-align:right;margin-bottom:24px">
 		<form name="start_file_activity" method="POST" action="/update.php" target="progressFrame">
-			<input type="hidden" name="#command" value="/plugins/file.activity/scripts/rc.file.activity">
+			<input type="hidden" name="#command" value="/plugins/unraid-file-caching/scripts/rc.unraid-file-caching">
 			<input type="hidden" name="#arg[1]" value="start">
 			<input type="submit" value="_(Start)_" title="_(Start File Activity)_">
 		</form>
@@ -94,7 +98,7 @@ $(function() {
 	<?else:?>
 	<div style="position:relative;float:left;text-align:right;margin-bottom:24px">
 		<form name="stop_file_activity" method="POST" action="/update.php" target="progressFrame">
-			<input type="hidden" name="#command" value="/plugins/file.activity/scripts/rc.file.activity">
+			<input type="hidden" name="#command" value="/plugins/unraid-file-caching/scripts/rc.unraid-file-caching">
 			<input type="hidden" name="#arg[1]" value="stop">
 			<input type="submit" value="_(Stop)_" title="_(Stop File Activity Logging)_">
 		</form>
@@ -105,7 +109,7 @@ $(function() {
 	</div>
 	<div style="position:relative;float:left;text-align:right;margin-bottom:24px">
 		<form name="clear log" method="POST" action="/update.php" target="progressFrame">
-			<input type="hidden" name="#command" value="/plugins/file.activity/scripts/rc.file.activity">
+			<input type="hidden" name="#command" value="/plugins/unraid-file-caching/scripts/rc.unraid-file-caching">
 			<input type="hidden" name="#arg[1]" value="clear">
 			<input type="submit" value="_(Clear)_" title="_(Clear the File Activity log)_">
 		</form>
@@ -115,4 +119,5 @@ $(function() {
 	</div>
 <?else:?>
 	<p>Array is stopped!</p>
+<?endif;?>
 <?endif;?>
