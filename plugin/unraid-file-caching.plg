@@ -31,7 +31,8 @@
     The 'source' file.
     -->
     <FILE Name="/boot/config/plugins/&name;/&name;-&version;.txz" Run="upgradepkg --install-new">
-    <URL>https://raw.github.com/&github;/main/archive/&name;-&version;-x86_64-1.txz</URL>
+    <!--<URL>https://raw.github.com/&github;/main/archive/&name;-&version;-x86_64-1.txz</URL>-->
+    <URL>http://127.0.0.1:8000/&name;-&version;-x86_64-1.txz</URL>
     <!--<MD5>&md5;</MD5>-->
     </FILE>
 

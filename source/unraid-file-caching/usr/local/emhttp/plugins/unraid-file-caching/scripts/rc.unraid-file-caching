@@ -1,0 +1,77 @@
+#!/bin/bash
+# Usage:
+# start|stop|clear|update.
+#
+
+file_activity_start() {
+	logger "Starting File Activity" -t"$PROG_NAME"
+
+	# Is file activity running?
+	if [ ! -e "/var/run/${plugin}.pid" ]; then
+		echo "Starting File Activity..."
+
+		# Start inotify script to monitor disk events
+		at -M -f /usr/local/emhttp/plugins/unraid-file-caching/scripts/inotify.unraid-file-caching now 2>/dev/null
+
+		sleep 2
+	else
+		echo "File Activity already running"
+		logger "File Activity already running" -t"$PROG_NAME"
+	fi
+}
+
+file_activity_stop() {
+	logger "Stopping File Activity" -t"$PROG_NAME"
+
+	# Is the files active inotify script running?
+	if [ -e "/var/run/${plugin}.pid" ]; then
+		echo "Stopping File Activity..."
+
+		# Kill all file activity processes.
+		for pid in $(ps -ef|grep .*inotifywait.*appdata | grep -v grep|awk "{ print \$2}")
+		do
+			kill $pid >/dev/null 2>&1
+		done	
+
+		sleep 2
+	else
+		echo "File Activity is not running"
+		logger "File Activity is not running" -t"$PROG_NAME"
+	fi
+}
+
+file_activity_clear() {
+	# Clear the file activity log.
+	echo "" > /var/log/unraid-file-caching.log
+}
+
+file_activity_update() {
+	file_activity_stop
+
+	# Start file activity if service is enabled and not already running.
+	if [ "$SERVICE" = "enable" ]; then
+		file_activity_start
+	fi
+}
+
+plugin="unraid-file-caching"
+CONFIG="/boot/config/plugins/${plugin}/${plugin}.cfg"
+source $CONFIG
+PROG_NAME=${plugin}
+
+case "$1" in
+	'start')
+		file_activity_start
+	;;
+	'stop')
+		file_activity_stop
+	;;
+	'clear')
+		file_activity_clear
+	;;
+	'update')
+		file_activity_update
+	;;
+	*)
+		echo "usage $0 start|stop|clear|update"
+esac
